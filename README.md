@@ -245,3 +245,10 @@ Como evolução do projeto, poderão ser implementados:
 ## 👨‍💻 Sobre o Projeto
 
 Projeto desenvolvido para estudo e prática de **SQL Server e Banco de Dados**, com foco na aplicação dos conhecimentos adquiridos durante minha formação em **Sistemas de Informação** e na construção do meu portfólio profissional.
+---
+
+## 🗺️ Diagrama Entidade-Relacionamento (DER)
+
+O diagrama abaixo representa a estrutura do banco de dados e os relacionamentos entre as entidades do Sistema de Vendas.
+
+![Diagrama Entidade-Relacionamento](drawSQL-image-export-2026-08-18%20(1).webp)
