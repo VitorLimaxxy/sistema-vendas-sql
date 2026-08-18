@@ -10,12 +10,12 @@ O projeto contempla desde a criação e modelagem do banco de dados até consult
 
 O objetivo deste projeto é desenvolver um banco de dados capaz de armazenar e relacionar informações de um sistema de vendas, incluindo:
 
-* Clientes
 * Categorias
-* Produtos
-* Pedidos
-* Itens dos pedidos
+* Clientes
+* Itens_Pedido
 * Pagamentos
+* Pedidos
+* Produtos
 
 Além do armazenamento dos dados, o projeto possui consultas para geração de relatórios, automações com triggers, procedures para consultas parametrizadas e índices para otimização.
 
@@ -43,7 +43,7 @@ O banco de dados `SistemaVendas` é composto pelas principais tabelas:
 | `Produtos`     | Armazena produtos, preços e estoque              |
 | `Pedidos`      | Registra os pedidos realizados                   |
 | `Itens_pedido` | Armazena os produtos pertencentes a cada pedido  |
-| `Pagamento`    | Registra informações relacionadas aos pagamentos |
+| `Pagamentos`    | Registra informações relacionadas aos pagamentos |
 
 As tabelas são relacionadas através de **Primary Keys (PK)** e **Foreign Keys (FK)**, garantindo integridade e consistência dos dados.
 
@@ -54,16 +54,17 @@ As tabelas são relacionadas através de **Primary Keys (PK)** e **Foreign Keys 
 ```text
 sistema-vendas-sql/
 │
-├── banco de dados/
+├── database/
 │   ├── 01_create_database.sql
 │   ├── 02_create_tables.sql
-│   ├── 03_inserir_dados.sql
+│   ├── 03_insert_data.sql
 │   ├── 04_consultas.sql
 │   ├── 05_views.sql
-│   ├── 06_procedimentos.sql
-│   ├── 07_gatilhos.sql
-│   └── 08_indices.sql
+│   ├── 06_procedures.sql
+│   ├── 07_triggers.sql
+│   └── 08_indexes.sql
 │
+├── drawSQL-image-export-2026-08-18 (1).webp
 └── README.md
 ```
 
@@ -102,8 +103,8 @@ Views desenvolvidas:
 
 ```text
 vw_total_pedido
-vw_produtos_vendidos
 vw_detalhes_pedido
+vw_produtos_vendidos
 vw_resumo_clientes
 ```
 
