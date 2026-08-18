@@ -7,17 +7,13 @@ GO
 -- =====================================================
 
 
--- =====================================================
 -- 1. LISTAR TODOS OS CLIENTES
--- =====================================================
 SELECT *
 FROM Clientes;
 GO
 
 
--- =====================================================
--- 2. LISTAR TODOS OS PRODUTOS COM SUAS CATEGORIAS
--- =====================================================
+-- 2. PRODUTOS COM SUAS CATEGORIAS
 SELECT
     p.id_produto,
     p.nome AS produto,
@@ -30,14 +26,13 @@ INNER JOIN Categorias c
 GO
 
 
--- =====================================================
--- 3. LISTAR PEDIDOS COM O NOME DOS CLIENTES
--- =====================================================
+-- 3. PEDIDOS COM CLIENTES
 SELECT
     pe.id_pedido,
     c.nome AS cliente,
     pe.data_pedido,
-    pe.status
+    pe.status,
+    pe.valor_total
 FROM Pedidos pe
 INNER JOIN Clientes c
     ON pe.id_cliente = c.id_cliente
@@ -45,9 +40,7 @@ ORDER BY pe.data_pedido DESC;
 GO
 
 
--- =====================================================
--- 4. LISTAR OS ITENS DE CADA PEDIDO
--- =====================================================
+-- 4. ITENS DE CADA PEDIDO
 SELECT
     ip.id_item,
     ip.id_pedido,
@@ -55,41 +48,37 @@ SELECT
     ip.quantidade,
     ip.preco_unitario,
     (ip.quantidade * ip.preco_unitario) AS subtotal
-FROM Itens_pedidos ip
+FROM Itens_Pedido ip
 INNER JOIN Produtos p
     ON ip.id_produto = p.id_produto
 ORDER BY ip.id_pedido;
 GO
 
 
--- =====================================================
--- 5. CALCULAR O VALOR TOTAL DE CADA PEDIDO
--- =====================================================
+-- 5. VALOR CALCULADO DE CADA PEDIDO
 SELECT
     pe.id_pedido,
     c.nome AS cliente,
-    SUM(ip.quantidade * ip.preco_unitario) AS valor_total
+    SUM(ip.quantidade * ip.preco_unitario) AS valor_calculado
 FROM Pedidos pe
 INNER JOIN Clientes c
     ON pe.id_cliente = c.id_cliente
-INNER JOIN Itens_pedidos ip
+INNER JOIN Itens_Pedido ip
     ON pe.id_pedido = ip.id_pedido
 GROUP BY
     pe.id_pedido,
     c.nome
-ORDER BY valor_total DESC;
+ORDER BY valor_calculado DESC;
 GO
 
 
--- =====================================================
--- 6. MOSTRAR OS PRODUTOS MAIS VENDIDOS
--- =====================================================
+-- 6. PRODUTOS MAIS VENDIDOS
 SELECT
     p.id_produto,
     p.nome AS produto,
     SUM(ip.quantidade) AS quantidade_vendida
 FROM Produtos p
-INNER JOIN Itens_pedidos ip
+INNER JOIN Itens_Pedido ip
     ON p.id_produto = ip.id_produto
 GROUP BY
     p.id_produto,
@@ -98,9 +87,7 @@ ORDER BY quantidade_vendida DESC;
 GO
 
 
--- =====================================================
--- 7. MOSTRAR OS CLIENTES QUE MAIS COMPRARAM
--- =====================================================
+-- 7. CLIENTES QUE MAIS COMPRARAM
 SELECT
     c.id_cliente,
     c.nome AS cliente,
@@ -109,7 +96,7 @@ SELECT
 FROM Clientes c
 INNER JOIN Pedidos pe
     ON c.id_cliente = pe.id_cliente
-INNER JOIN Itens_pedidos ip
+INNER JOIN Itens_Pedido ip
     ON pe.id_pedido = ip.id_pedido
 GROUP BY
     c.id_cliente,
@@ -118,18 +105,14 @@ ORDER BY total_gasto DESC;
 GO
 
 
--- =====================================================
 -- 8. FATURAMENTO TOTAL
--- =====================================================
 SELECT
     SUM(ip.quantidade * ip.preco_unitario) AS faturamento_total
-FROM Itens_pedidos ip;
+FROM Itens_Pedido ip;
 GO
 
 
--- =====================================================
--- 9. QUANTIDADE DE PEDIDOS POR STATUS
--- =====================================================
+-- 9. PEDIDOS POR STATUS
 SELECT
     status,
     COUNT(*) AS quantidade_pedidos
@@ -139,35 +122,32 @@ ORDER BY quantidade_pedidos DESC;
 GO
 
 
--- =====================================================
--- 10. LISTAR PAGAMENTOS DOS PEDIDOS
--- =====================================================
+-- 10. PAGAMENTOS
 SELECT
     pg.id_pagamento,
     pg.id_pedido,
     c.nome AS cliente,
-    pg.forma_pagamento,
+    pg.metodo,
     pg.valor,
+    pg.data_pagamento,
     pg.status
-FROM Pagamento pg
+FROM Pagamentos pg
 INNER JOIN Pedidos pe
     ON pg.id_pedido = pe.id_pedido
 INNER JOIN Clientes c
     ON pe.id_cliente = c.id_cliente
-ORDER BY pg.id_pagamento;
+ORDER BY pg.data_pagamento DESC;
 GO
 
 
--- =====================================================
 -- 11. FATURAMENTO POR CATEGORIA
--- =====================================================
 SELECT
     c.nome AS categoria,
     SUM(ip.quantidade * ip.preco_unitario) AS faturamento
 FROM Categorias c
 INNER JOIN Produtos p
     ON c.id_categoria = p.id_categoria
-INNER JOIN Itens_pedidos ip
+INNER JOIN Itens_Pedido ip
     ON p.id_produto = ip.id_produto
 GROUP BY
     c.nome
@@ -175,24 +155,20 @@ ORDER BY faturamento DESC;
 GO
 
 
--- =====================================================
--- 12. TICKET MÉDIO DOS PEDIDOS
--- =====================================================
+-- 12. TICKET MÉDIO
 SELECT
     AVG(valor_pedido) AS ticket_medio
 FROM (
     SELECT
         id_pedido,
         SUM(quantidade * preco_unitario) AS valor_pedido
-    FROM Itens_pedidos
+    FROM Itens_Pedido
     GROUP BY id_pedido
 ) AS pedidos_calculados;
 GO
 
 
--- =====================================================
 -- 13. PRODUTOS COM ESTOQUE BAIXO
--- =====================================================
 SELECT
     id_produto,
     nome AS produto,
@@ -203,9 +179,7 @@ ORDER BY estoque ASC;
 GO
 
 
--- =====================================================
--- 14. QUANTIDADE DE PRODUTOS POR CATEGORIA
--- =====================================================
+-- 14. PRODUTOS POR CATEGORIA
 SELECT
     c.nome AS categoria,
     COUNT(p.id_produto) AS quantidade_produtos
@@ -218,13 +192,11 @@ ORDER BY quantidade_produtos DESC;
 GO
 
 
--- =====================================================
--- 15. RESUMO GERAL DO SISTEMA
--- =====================================================
+-- 15. RESUMO GERAL
 SELECT
     (SELECT COUNT(*) FROM Clientes) AS total_clientes,
     (SELECT COUNT(*) FROM Produtos) AS total_produtos,
     (SELECT COUNT(*) FROM Pedidos) AS total_pedidos,
-    (SELECT COUNT(*) FROM Itens_pedidos) AS total_itens_vendidos,
-    (SELECT COUNT(*) FROM Pagamento) AS total_pagamentos;
+    (SELECT COUNT(*) FROM Itens_Pedido) AS total_itens,
+    (SELECT COUNT(*) FROM Pagamentos) AS total_pagamentos;
 GO
